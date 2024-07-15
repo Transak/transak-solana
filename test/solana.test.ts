@@ -118,4 +118,18 @@ describe('Solana module', () => {
     },
     mainTimeout * 3,
   );
+
+
+  test(
+    'should calculateNetworkFee',
+    async function () {
+      const { network, publicKey } = testData;
+
+      const result = await SolanaLib.calculateNetworkFee(network,publicKey);
+
+      console.log({ result });
+      expect(typeof result.baseFee).toBe('number');
+    },
+    mainTimeout,
+  );
 });
