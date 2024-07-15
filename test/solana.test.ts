@@ -109,7 +109,6 @@ describe('Solana module', () => {
     async function () {
       const { network } = testData;
       const { transactionHash: txnId } = runtime;
-      // const txnId = '5yNAhBoHBbppESwc2o1gLuYQwkDYYzBP5gT2s6zrcDbWWZkR5wbKCYsKFoGH2XAA4qgbgd8EUznWdbmjcFe2bs3A';
 
       const result = await SolanaLib.getTransaction(txnId, network);
       console.log({ result });
@@ -117,5 +116,18 @@ describe('Solana module', () => {
       if (result) expect(Object.keys(result.receipt)).toEqual(expect.arrayContaining(keys.getTransactionResponse));
     },
     mainTimeout * 3,
+  );
+
+  test(
+    'should calculateNetworkFee',
+    async function () {
+      const { network, publicKey } = testData;
+
+      const result = await SolanaLib.calculateNetworkFee(network, publicKey);
+
+      console.log({ result });
+      expect(typeof result.baseFee).toBe('number');
+    },
+    mainTimeout,
   );
 });

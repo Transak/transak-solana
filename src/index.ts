@@ -107,15 +107,13 @@ async function getTransaction(txnId: string, network: string): Promise<GetTransa
       return null;
     }
 
-    console.log(transactionData);
-
     return {
       transactionData,
       receipt: {
         from: transactionData.transaction.message?.accountKeys?.[0]?.toString() || '',
         date: transactionData.blockTime,
         gasCostCryptoCurrency: 'SOL',
-        gasCostInCrypto: transactionData.meta.fee,
+        gasCostInCrypto: transactionData.meta.fee / LAMPORTS_PER_SOL,
         gasLimit: transactionData.meta.computeUnitsConsumed,
         isPending: false,
         isExecuted: true,
@@ -177,7 +175,6 @@ async function sendTransaction({ to, amount, network, privateKey, decimals, toke
   // Sign and send the transaction
   const signature = await connection.sendTransaction(transaction, [senderKeypair]);
   const receipt = await connection.confirmTransaction(signature, 'confirmed');
-  console.log('receipt: ', receipt);
 
   return {
     transactionData: { signature },
@@ -196,6 +193,30 @@ async function sendTransaction({ to, amount, network, privateKey, decimals, toke
   };
 }
 
+async function calculateNetworkFee(
+  network: string,
+  publicKey: string,
+): Promise<{
+  baseFee: number;
+  priorityFee: number;
+}> {
+  const connection = await getConnection(network);
+
+  const blockhash = (await connection.getLatestBlockhash('finalized')).blockhash;
+
+  const message = new Transaction({
+    recentBlockhash: blockhash,
+    feePayer: new PublicKey(publicKey),
+  }).compileMessage();
+
+  const feeCalculator = await connection.getFeeForMessage(message);
+  const baseFee = feeCalculator.value;
+
+  const recentPrioritizationFees = await connection.getRecentPrioritizationFees();
+
+  return { baseFee, priorityFee: recentPrioritizationFees[0].prioritizationFee };
+}
+
 export = {
   getTransactionLink,
   getWalletLink,
@@ -203,4 +224,5 @@ export = {
   isValidWalletAddress,
   sendTransaction,
   getBalance,
+  calculateNetworkFee,
 };
