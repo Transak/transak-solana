@@ -107,7 +107,6 @@ async function getTransaction(txnId: string, network: string): Promise<GetTransa
       return null;
     }
 
-    console.log(transactionData);
 
     return {
       transactionData,
@@ -177,7 +176,7 @@ async function sendTransaction({ to, amount, network, privateKey, decimals, toke
   // Sign and send the transaction
   const signature = await connection.sendTransaction(transaction, [senderKeypair]);
   const receipt = await connection.confirmTransaction(signature, 'confirmed');
-  console.log('receipt: ', receipt);
+  
 
   return {
     transactionData: { signature },
@@ -205,7 +204,7 @@ async function calculateNetworkFee(
 }> {
   const connection = await getConnection(network);
 
-  let blockhash = (await connection.getLatestBlockhash('finalized')).blockhash;
+  const blockhash = (await connection.getLatestBlockhash('finalized')).blockhash;
 
   const message = new Transaction({
     recentBlockhash: blockhash,
