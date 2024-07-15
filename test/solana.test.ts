@@ -9,7 +9,7 @@ const mainTimeout = 14000;
 
 // testData
 const testData = {
-  publicKey: process.env.MY_PUBLIC_KEY || '461rwYh5yghpEnNsKiUJ2J7UvGysLbPi63dkcrXas3e3', 
+  publicKey: process.env.MY_PUBLIC_KEY || '461rwYh5yghpEnNsKiUJ2J7UvGysLbPi63dkcrXas3e3',
   privateKey: process.env.MY_PRIVATE_KEY || '44p6YM833EyCc7UsUjsrCEw1XXjYWRgGPQ2aQmDSuhxSjquF2ut4LBHDzbpnrQz8sWG5ZJmxJwHVFqfjK9nQX37h',
   toWalletAddress: process.env.TOWALLETADDRESS || 'HPC9kMWf6DLD6oYW9znD4CGgsJqjAtQ4RnGN5d91wNsg',
   network: process.env.NETWORK || 'testnet',
@@ -33,9 +33,7 @@ const keys = {
     'transactionReceipt',
   ],
   getTransactionResponse: [
-    // 'amount',
     'date',
-    // 'from',
     'gasCostCryptoCurrency',
     'gasCostInCrypto',
     'gasLimit',
@@ -54,14 +52,14 @@ const keys = {
 const runtime = { transactionHash: '' };
 
 describe('Solana module', () => {
-  test.skip(
+  test(
     'should getBalance',
     async function () {
       const { network, decimals, tokenAddress, publicKey } = testData;
 
       const result = await SolanaLib.getBalance(
         network,
-        decimals,
+
         publicKey,
         tokenAddress, // token Id
       );
@@ -72,7 +70,7 @@ describe('Solana module', () => {
     mainTimeout,
   );
 
-  test.skip(
+  test(
     'should isValidWalletAddress',
     async function () {
       const result = await SolanaLib.isValidWalletAddress(testData.toWalletAddress);
@@ -106,7 +104,7 @@ describe('Solana module', () => {
     mainTimeout * 3,
   );
 
-  test.skip(
+  test(
     'should getTransaction',
     async function () {
       const { network } = testData;
