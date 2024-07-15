@@ -107,7 +107,6 @@ async function getTransaction(txnId: string, network: string): Promise<GetTransa
       return null;
     }
 
-
     return {
       transactionData,
       receipt: {
@@ -176,7 +175,6 @@ async function sendTransaction({ to, amount, network, privateKey, decimals, toke
   // Sign and send the transaction
   const signature = await connection.sendTransaction(transaction, [senderKeypair]);
   const receipt = await connection.confirmTransaction(signature, 'confirmed');
-  
 
   return {
     transactionData: { signature },
