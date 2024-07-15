@@ -59,12 +59,11 @@ async function getConnection(network: string): Promise<any> {
 /**
  * Get the balance of the transak wallet address
  * @param network
- * @param decimals
  * @param privateKey
  * @param tokenAddress // tokenAddress
  * @returns
  */
-async function getBalance(network: string, decimals: number, publicKey: string, tokenAddress?: string): Promise<number> {
+async function getBalance(network: string, publicKey: string, tokenAddress?: string): Promise<number> {
   const connection = await getConnection(network);
 
   if (tokenAddress) {
@@ -82,7 +81,7 @@ async function getBalance(network: string, decimals: number, publicKey: string, 
   }
 
   const _publicKey = new PublicKey(publicKey);
-  let solBalance = await connection.getBalance(_publicKey);
+  const solBalance = await connection.getBalance(_publicKey);
   return Number(solBalance / LAMPORTS_PER_SOL);
 }
 
