@@ -49,3 +49,12 @@ export type SendTransactionResult = {
     transactionReceipt: any;
   };
 };
+
+export type getFeeStatsResult = {
+  feeCryptoCurrency: string;
+  baseFee: number;
+  lowFeeCharged: number;
+  standardFeeCharged: number;
+  fastFeeCharged: number;
+  maxFeeCharged: number;
+};
