@@ -16,7 +16,7 @@ const testData = {
   crypto: 'SOL',
   amount: 0.5,
   decimals: 6,
-  tokenAddress: '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU', // '0.0.48220530'
+  tokenAddress: '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU', //'4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU',
 };
 
 const keys = {
@@ -110,8 +110,11 @@ describe('Solana module', () => {
       const { network } = testData;
       const { transactionHash: txnId } = runtime;
 
-      const result = await SolanaLib.getTransaction(txnId, network);
-      console.log({ result });
+      const result = await SolanaLib.getTransaction(
+        '5gYzs3rkNFsmdJ4zfkPjfHQ4SU4Er52nzpn3PXqPjH5EuVCKMwjzf9CoR5z392HCxRrT7dZJgFdCjEGceSu6cHSR',
+        network,
+      );
+      console.log(result);
 
       if (result) expect(Object.keys(result.receipt)).toEqual(expect.arrayContaining(keys.getTransactionResponse));
     },
@@ -123,7 +126,7 @@ describe('Solana module', () => {
     async function () {
       const { network, publicKey } = testData;
 
-      const result = await SolanaLib.calculateNetworkFee(network, publicKey);
+      const result = await SolanaLib.getFeeStats(network, publicKey);
 
       console.log({ result });
       expect(typeof result.baseFee).toBe('number');

@@ -2,7 +2,8 @@ import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transa
 import { getOrCreateAssociatedTokenAccount, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import bs58 from 'bs58';
 import { networks } from './config';
-import { Network, GetTransactionResult, SendTransactionResult, SendTransactionParams } from './types';
+import { Network, GetTransactionResult, SendTransactionResult, SendTransactionParams, getFeeStatsResult } from './types';
+import { convertToLamports } from './util';
 
 /**
  * Get the network config
@@ -82,7 +83,7 @@ async function getBalance(network: string, publicKey: string, tokenAddress?: str
 
   const _publicKey = new PublicKey(publicKey);
   const solBalance = await connection.getBalance(_publicKey);
-  return Number(solBalance / LAMPORTS_PER_SOL);
+  return convertToLamports(solBalance);
 }
 
 /**
@@ -108,12 +109,12 @@ async function getTransaction(txnId: string, network: string): Promise<GetTransa
     }
 
     return {
-      transactionData,
+      transactionData: JSON.parse(JSON.stringify(transactionData)),
       receipt: {
         from: transactionData.transaction.message?.accountKeys?.[0]?.toString() || '',
         date: transactionData.blockTime,
         gasCostCryptoCurrency: 'SOL',
-        gasCostInCrypto: transactionData.meta.fee / LAMPORTS_PER_SOL,
+        gasCostInCrypto: convertToLamports(transactionData.meta.fee),
         gasLimit: transactionData.meta.computeUnitsConsumed,
         isPending: false,
         isExecuted: true,
@@ -193,13 +194,7 @@ async function sendTransaction({ to, amount, network, privateKey, decimals, toke
   };
 }
 
-async function calculateNetworkFee(
-  network: string,
-  publicKey: string,
-): Promise<{
-  baseFee: number;
-  priorityFee: number;
-}> {
+async function getFeeStats(network: string, publicKey: string): Promise<getFeeStatsResult> {
   const connection = await getConnection(network);
 
   const blockhash = (await connection.getLatestBlockhash('finalized')).blockhash;
@@ -213,8 +208,16 @@ async function calculateNetworkFee(
   const baseFee = feeCalculator.value;
 
   const recentPrioritizationFees = await connection.getRecentPrioritizationFees();
+  const priorityFee = recentPrioritizationFees[0].prioritizationFee;
 
-  return { baseFee, priorityFee: recentPrioritizationFees[0].prioritizationFee };
+  return {
+    feeCryptoCurrency: 'SOL',
+    baseFee: convertToLamports(baseFee),
+    lowFeeCharged: convertToLamports(baseFee),
+    standardFeeCharged: convertToLamports(baseFee),
+    fastFeeCharged: convertToLamports(baseFee + priorityFee),
+    maxFeeCharged: convertToLamports(baseFee + priorityFee),
+  };
 }
 
 export = {
@@ -224,5 +227,5 @@ export = {
   isValidWalletAddress,
   sendTransaction,
   getBalance,
-  calculateNetworkFee,
+  getFeeStats,
 };
